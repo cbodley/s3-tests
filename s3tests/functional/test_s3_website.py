@@ -226,7 +226,8 @@ def _website_expected_redirect_response(res, status, reason, new_url):
     ok(len(body) == 0, 'Body of a redirect should be empty')
 
 def _website_request(bucket_name, path, connect_hostname=None, method='GET', timeout=None):
-    url = get_website_url(proto='http', bucket=bucket_name, path=path)
+    proto = 'https' if config.main.is_secure else 'http'
+    url = get_website_url(proto=proto, bucket=bucket_name, path=path)
     print("url", url)
     o = urlparse(url)
     if connect_hostname is None:
@@ -236,7 +237,7 @@ def _website_request(bucket_name, path, connect_hostname=None, method='GET', tim
     request_headers['Host'] = o.hostname
     request_headers['Accept'] = '*/*'
     print('Request: {method} {path}\n{headers}'.format(method=method, path=path, headers=''.join(map(lambda t: t[0]+':'+t[1]+"\n", request_headers.items()))))
-    res = _make_raw_request(connect_hostname, config.main.port, method, path, request_headers=request_headers, secure=False, timeout=timeout)
+    res = _make_raw_request(connect_hostname, config.main.port, method, path, request_headers=request_headers, secure=config.main.is_secure, timeout=timeout)
     for (k,v) in res.getheaders():
         print(k,v)
     return res
