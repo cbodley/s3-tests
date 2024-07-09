@@ -13721,6 +13721,9 @@ def test_get_object_attributes():
     response = client.get_object_attributes(Bucket=bucket_name, Key=key, \
                                             ObjectAttributes=request_attributes)
 
+    print("get_object_attributes response:")
+    print(response)
+    
     # check overall object
     assert response['ObjectSize'] == objlen
     assert response['Checksum']['ChecksumSHA256'] == upload_checksum
