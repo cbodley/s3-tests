@@ -28,6 +28,7 @@ from collections import namedtuple
 from collections import defaultdict
 from io import StringIO
 from io import BytesIO
+import pdb
 
 from email.header import decode_header
 
@@ -8593,7 +8594,7 @@ def test_lifecycle_expiration_size_gt():
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
     lc_interval = get_lc_debug_interval()
-    time.sleep(2*lc_interval)
+    time.sleep(3*lc_interval)
 
     # we should find only the small object present
     response = client.list_objects(Bucket=bucket_name)
@@ -8646,7 +8647,7 @@ def test_lifecycle_expiration_size_lt():
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
     lc_interval = get_lc_debug_interval()
-    time.sleep(2*lc_interval)
+    time.sleep(3*lc_interval)
 
     # we should find only the large object present
     response = client.list_objects(Bucket=bucket_name)
@@ -13701,6 +13702,7 @@ def test_get_object_attributes():
     bucket_name = get_new_bucket()
     client = get_client()
 
+    pdb.set_trace()
     key = "multipart_checksum"
     key_metadata = {'foo': 'bar'}
     content_type = 'text/plain'
@@ -13721,6 +13723,7 @@ def test_get_object_attributes():
     response = client.get_object_attributes(Bucket=bucket_name, Key=key, \
                                             ObjectAttributes=request_attributes)
 
+    pdb.set_trace()
     print("get_object_attributes response:")
     print(response)
     
