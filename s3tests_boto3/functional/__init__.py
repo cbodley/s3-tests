@@ -259,6 +259,7 @@ def setup():
     config.tenant_display_name = cfg.get('s3 tenant',"display_name")
     config.tenant_user_id = cfg.get('s3 tenant',"user_id")
     config.tenant_email = cfg.get('s3 tenant',"email")
+    config.tenant_name = cfg.get('s3 tenant',"tenant")
 
     # vars from the fixtures section
     try:
@@ -685,6 +686,9 @@ def get_tenant_aws_secret_key():
 
 def get_tenant_display_name():
     return config.tenant_display_name
+
+def get_tenant_name():
+    return config.tenant_name
 
 def get_tenant_user_id():
     return config.tenant_user_id
