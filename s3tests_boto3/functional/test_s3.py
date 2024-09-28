@@ -1212,6 +1212,7 @@ def test_bucket_listv2_unordered():
     intersect = set(unordered_keys_out).intersection(unordered_keys_out2)
     assert 0 == len(intersect)
 
+    #pdb.set_trace()
     # verify that unordered used with delimiter results in error
     e = assert_raises(ClientError,
                       client.list_objects, Bucket=bucket_name, Delimiter="/")
@@ -13702,11 +13703,11 @@ def test_get_object_attributes():
     bucket_name = get_new_bucket()
     client = get_client()
 
-    pdb.set_trace()
+    #pdb.set_trace()
     key = "multipart_checksum"
     key_metadata = {'foo': 'bar'}
     content_type = 'text/plain'
-    objlen = 30 * 1024 * 1024
+    objlen = 64 * 1024 * 1024
 
     (upload_id, data, parts, checksums) = \
     _multipart_upload_checksum(bucket_name=bucket_name, key=key, size=objlen,
@@ -13728,15 +13729,18 @@ def test_get_object_attributes():
     print(response)
     
     # check overall object
+    nparts = len(parts)
     assert response['ObjectSize'] == objlen
     assert response['Checksum']['ChecksumSHA256'] == upload_checksum
-    assert response['ObjectParts']['TotalPartsCount'] == len(parts)
-    assert len(response['ObjectParts']['Parts']) == 6
+    assert response['ObjectParts']['TotalPartsCount'] == nparts
 
     # check the parts
     partno = 1
     for obj_part in response['ObjectParts']['Parts']:
         assert obj_part['PartNumber'] == partno
-        assert obj_part['Size'] == 5 * 1024 * 1024
+        if partno < len(parts):
+            assert obj_part['Size'] == 5 * 1024 * 1024
+        else:
+            assert obj_part['Size'] == objlen - ((nparts-1) * (5 * 1024 * 1024))
         assert obj_part['ChecksumSHA256'] == checksums[partno - 1]
         partno += 1
