@@ -13947,6 +13947,42 @@ def test_get_versioned_object_attributes():
     assert response['StorageClass'] == 'STANDARD'
     assert 'ObjectParts' not in response
 
+@pytest.mark.encryption
+def test_get_sse_c_encrypted_object_attributes():
+    bucket_name = get_new_bucket()
+    client = get_client()
+    key = 'obj'
+    objlen = 1000
+    data = 'A'*objlen
+    sse_args = {
+        'SSECustomerAlgorithm': 'AES256',
+        'SSECustomerKey': 'pO3upElrwuEXSoFwCfnZPdSsmt/xWeFa0N9KgDijwVs=',
+        'SSECustomerKeyMD5': 'DWygnHRtgiJ77HCm+1rvHw=='
+    }
+    attrs = ['ETag', 'Checksum', 'ObjectParts', 'StorageClass', 'ObjectSize']
+
+    response = client.put_object(Bucket=bucket_name, Key=key, Body=data, **sse_args)
+    etag = response['ETag'].strip('"')
+    assert len(etag)
+
+    # GetObjectAttributes fails without sse-c headers
+    e = assert_raises(ClientError, client.get_object_attributes,
+                      Bucket=bucket_name, Key=key, ObjectAttributes=attrs)
+    status, error_code = _get_status_and_error_code(e.response)
+    assert status == 400
+
+    # and succeeds sse-c headers
+    response = client.get_object_attributes(Bucket=bucket_name, Key=key,
+                                            ObjectAttributes=attrs, **sse_args)
+
+    assert 'DeleteMarker' not in response
+    assert 'VersionId' not in response
+
+    assert response['ObjectSize'] == objlen
+    assert response['ETag'] == etag
+    assert response['StorageClass'] == 'STANDARD'
+    assert 'ObjectParts' not in response
+
 def test_get_object_attributes():
     bucket_name = get_new_bucket()
     client = get_client()
