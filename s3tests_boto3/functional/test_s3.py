@@ -12859,7 +12859,6 @@ def test_sse_s3_encrypted_upload_8mb():
     _test_sse_s3_encrypted_upload(8*1024*1024)
 
 
-@pytest.mark.s3
 def test_upload_part_copy_percent_encoded_key():
     
     s3_client = get_client()
